@@ -38,8 +38,44 @@ class Alternatif extends CI_Controller
 
 	public function submit_alternatif()
 	{
-		// $data['jurnal'] = $this->M_alternatif->tampil_data_jurnal()->result();
-		$this->form_validation->set_rules('inputkode', 'inputname', 'warningrakkanggo', 'is_unique[alternatif.urutan]', 'is_unique[alternatif_details.nama]');
+		$this->form_validation->set_rules('inputkode', 'warningrakkanggo', 'is_unique[alternatif.urutan]');
+		$this->form_validation->set_rules('nama', 'warningrakkanggo', 'is_unique[alternatif_details.nama]');
+
+		if ($this->form_validation->run() == FALSE) {
+			$this->session->set_flashdata('duplicateKode', 'ok');
+			redirect('data-alternatif/add');
+		} else {
+			$kode = $this->input->post('inputkode');
+
+			$data = array(
+				'kode_alternatif' => strtoupper("a" . $kode),
+				'urutan' => $kode,
+			);
+
+			// $logadd = array(
+			// 	'id_user'=> $this->session->userdata('id_user'),
+			// 	'kode_alternatif'=> strtoupper("a".$kode),
+			// 	'event'=> 'Tambah Data Alternatif',
+			// );
+
+			$jdl = explode(';', $this->input->post('inputname'));
+
+			$atad = array(
+				'id' => $kode,
+				'kode_alternatif' => strtoupper("a" . $kode),
+				'nama' => $jdl[1],
+				'singkatan' => $jdl[0]
+			);
+
+			$this->M_alternatif->input_data_alternatif('alternatif', $data);
+			// $this->M_alternatif->input_data_log('log_penilaian',$logadd);
+			$this->M_alternatif->input_data_alternatif_details('alternatif_details', $atad);
+
+			$this->session->set_flashdata('successSave', 'ok');
+			redirect('data-alternatif');
+		}
+
+		$this->form_validation->set_rules('inputname', 'warningrakkanggo', 'is_unique[alternatif_details.nama]');
 		if ($this->form_validation->run() == FALSE) {
 			$this->session->set_flashdata('duplicateKode', 'ok');
 			redirect('data-alternatif/add');
